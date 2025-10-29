@@ -15,7 +15,7 @@ services:
             DOCKER_DIR: "/casa-website/"
     front:
         build:
-            context: ./front
+            context: ./json-editor
         restart: always
         ports:
             - "6001:80"
