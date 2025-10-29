@@ -2,11 +2,10 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-
 const PASSWORD = "$CasaEstate3334"; // change this to your local password
 
 export default function App() {
-    const [entered, setEntered] = useState(false);
+    const [entered, setEntered] = useState(true);
     const [inputPassword, setInputPassword] = useState("");
     const [jsonData, setJsonData] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -84,29 +83,79 @@ export default function App() {
         </div>
     );
 }
-
 function JsonEditor({ data, onChange, path }) {
+    const handleImageUpload = async (file) => {
+        // keep only a-z, A-Z, 0-9 and dot for extension
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, ""); // remove everything else
+
+        if (!sanitizedName) {
+            alert("Filename must contain at least one alphanumeric character");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("name", sanitizedName);
+
+        try {
+            const res = await axios.post("https://admin.casaestate.am/api/image", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            onChange(path, res.data.filename); // save filename in JSON
+        } catch (err) {
+            alert("Image upload failed");
+            console.error(err);
+        }
+    };
+
+    // img field
+    if (path[path.length - 1] === "img") {
+        return (
+            <div className="flex flex-col gap-2 my-1">
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                            handleImageUpload(e.target.files[0]);
+                        }
+                    }}
+                    className="border rounded p-1 w-full"
+                />
+                {typeof data === "string" && data && <span className="text-sm text-gray-600">Uploaded: {data}</span>}
+            </div>
+        );
+    }
+
+    // string
     if (typeof data === "string") {
         return <input type="text" value={data} onChange={(e) => onChange(path, e.target.value)} className="border rounded p-1 w-full my-1" />;
     }
 
+    // array
     if (Array.isArray(data)) {
         return (
             <div className="ml-4 space-y-1">
                 {data.map((item, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                        <input
-                            type="text"
-                            value={item}
-                            onChange={(e) => {
-                                const arr = [...data];
-                                arr[index] = e.target.value;
-                                onChange(path, arr);
-                            }}
-                            className="border rounded p-1 w-full"
-                        />
+                    <div key={index} className="flex gap-2 items-start">
+                        <div className="flex-1">
+                            {typeof item === "object" && item !== null ? (
+                                <JsonEditor data={item} onChange={onChange} path={[...path, index]} />
+                            ) : (
+                                <input
+                                    type="text"
+                                    value={item}
+                                    onChange={(e) => {
+                                        const arr = [...data];
+                                        arr[index] = e.target.value;
+                                        onChange(path, arr);
+                                    }}
+                                    className="border rounded p-1 w-full"
+                                />
+                            )}
+                        </div>
                         <button
-                            className="text-red-500"
+                            className="text-red-500 mt-1"
                             onClick={() => {
                                 const arr = data.filter((_, i) => i !== index);
                                 onChange(path, arr);
@@ -116,13 +165,26 @@ function JsonEditor({ data, onChange, path }) {
                         </button>
                     </div>
                 ))}
-                <button onClick={() => onChange(path, [...data, ""])} className="text-blue-600 text-sm">
-                    + Add item
-                </button>
+                <div className="flex gap-2 mt-1">
+                    <button onClick={() => onChange(path, [...data, ""])} className="text-blue-600 text-sm">
+                        + Add item
+                    </button>
+                    <button
+                        onClick={() => {
+                            const newObject = {};
+                            Object.keys(data[0]).map((k) => (newObject[k] = ""));
+                            onChange(path, [...data, newObject]);
+                        }}
+                        className="text-green-600 text-sm"
+                    >
+                        + Add object
+                    </button>
+                </div>
             </div>
         );
     }
 
+    // object
     if (typeof data === "object" && data !== null) {
         return (
             <div className="space-y-2">

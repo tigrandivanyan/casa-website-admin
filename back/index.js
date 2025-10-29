@@ -24,16 +24,31 @@ if (!fs.existsSync(IMAGE_UPLOAD_DIR)) {
     fs.mkdirSync(IMAGE_UPLOAD_DIR, { recursive: true });
 }
 
-// Configure multer for image uploads
+// storage configuration
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, IMAGE_UPLOAD_DIR);
+    destination: function (req, file, cb) {
+        cb(null, IMAGE_UPLOAD_DIR); // make sure this folder exists
     },
     filename: (req, file, cb) => {
-        const name = req.body.name || file.originalname;
-        cb(null, name);
+        // sanitize name from frontend or fallback
+        let name = req.body.name || file.originalname;
+        name = name.replace(/[^a-zA-Z0-9]/g, ""); // keep only alphanumerics and dot
+
+        const ext = path.extname(name);
+        const base = path.basename(name, ext);
+
+        // add suffix if file exists
+        let finalName = name;
+        let counter = 1;
+        while (fs.existsSync(path.join(UPLOAD_DIR, finalName))) {
+            finalName = `${base}_${counter}${ext}`;
+            counter++;
+        }
+
+        cb(null, finalName);
     },
 });
+
 const upload = multer({ storage });
 
 // Route 1: GET /read
