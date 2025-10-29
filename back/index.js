@@ -30,15 +30,17 @@ const storage = multer.diskStorage({
         cb(null, IMAGE_UPLOAD_DIR); // make sure this folder exists
     },
     filename: (req, file, cb) => {
-        // sanitize name from frontend or fallback
         let name = req.body.name || file.originalname;
-        name = name.replace(/[^a-zA-Z0-9]/g, ""); // keep only alphanumerics and dot
 
-        const ext = path.extname(name);
-        const base = path.basename(name, ext);
+        const ext = path.extname(name); // keep extension with dot
+        let base = path.basename(name, ext);
+
+        // remove all non-alphanumeric chars from base name
+        base = base.replace(/[^a-zA-Z0-9]/g, "");
+
+        let finalName = base + ext;
 
         // add suffix if file exists
-        let finalName = name;
         let counter = 1;
         while (fs.existsSync(path.join(IMAGE_UPLOAD_DIR, finalName))) {
             finalName = `${base}_${counter}${ext}`;

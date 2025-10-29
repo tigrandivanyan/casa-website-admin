@@ -85,13 +85,13 @@ export default function App() {
 }
 function JsonEditor({ data, onChange, path }) {
     const handleImageUpload = async (file) => {
-        // keep only a-z, A-Z, 0-9 and dot for extension
-        const sanitizedName = file.name.replace(/[^a-zA-Z0-9]/g, ""); // remove everything else
+        const ext = file.name.slice(file.name.lastIndexOf(".")); // keep extension with dot
+        let base = file.name.slice(0, file.name.lastIndexOf("."));
 
-        if (!sanitizedName) {
-            alert("Filename must contain at least one alphanumeric character");
-            return;
-        }
+        // remove all non-alphanumeric characters from base name
+        base = base.replace(/[^a-zA-Z0-9]/g, "");
+
+        const sanitizedName = base + ext;
 
         const formData = new FormData();
         formData.append("image", file);
