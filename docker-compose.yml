@@ -1,0 +1,15 @@
+services:
+    back:
+        build:
+            context: ./back
+        restart: always
+        ports:
+            - "6000:3000"
+        volumes:
+            - /home/tigrandivanyan/workers:/home/tigrandivanyan/workers:rw
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /root/casa-website/:/casa-website/
+        environment:
+            JSON_FILE_PATH: "/casa-website/src/texts.json"
+            IMAGE_UPLOAD_DIR: "/casa-website/public"
+            PORT: "3000"
