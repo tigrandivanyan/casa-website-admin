@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import multer from "multer";
 import cors from "cors";
-import { exec } from 'child_process';
+import { exec } from "child_process";
 
 dotenv.config();
 
@@ -50,15 +50,23 @@ app.post("/api/rewrite", (req, res) => {
     fs.writeFile(JSON_FILE_PATH, JSON.stringify(newJson, null, 2), "utf-8", (err) => {
         if (err) return res.status(500).json({ error: "Could not write JSON file" });
 
-        // After rewriting JSON, run docker-compose
+        // After rewriting JSON, run docker-compose down && up
         if (DOCKER_DIR) {
-            exec(`cd ${DOCKER_DIR} && docker-compose up -d --build`, (error, stdout, stderr) => {
+            const cmd = `cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d --build`;
+            exec(cmd, (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Docker error: ${error.message}`);
-                    return res.status(500).json({ message: "JSON updated, but Docker failed", error: error.message });
+                    return res.status(500).json({
+                        message: "JSON updated, but Docker failed",
+                        error: error.message,
+                        stderr,
+                    });
                 }
                 if (stderr) console.error(`Docker stderr: ${stderr}`);
-                res.json({ message: "JSON file updated and Docker Compose executed successfully", dockerOutput: stdout });
+                res.json({
+                    message: "JSON file updated and Docker Compose executed successfully",
+                    dockerOutput: stdout,
+                });
             });
         } else {
             res.json({ message: "JSON file updated successfully, but no DOCKER_DIR set" });
