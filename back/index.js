@@ -40,7 +40,7 @@ const storage = multer.diskStorage({
         // add suffix if file exists
         let finalName = name;
         let counter = 1;
-        while (fs.existsSync(path.join(UPLOAD_DIR, finalName))) {
+        while (fs.existsSync(path.join(IMAGE_UPLOAD_DIR, finalName))) {
             finalName = `${base}_${counter}${ext}`;
             counter++;
         }
