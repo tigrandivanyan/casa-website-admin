@@ -4,8 +4,126 @@ import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 const PASSWORD = "$CasaEstate3334"; // change this to your local password
 
+const keyTranslations: Record<string, string> = {
+    // banks
+    banks: "Բանկեր",
+    img: "Նկար",
+    name: "Անուն",
+    percentage: "Տոկոս",
+    minAmount: "Նվազագույն գումար",
+
+    // team
+    team: "Թիմ",
+    position: "Պաշտոն",
+
+    // navbar
+    navbar: "Նավիգացիա",
+    home: "Գլխավոր",
+    about_us: "Մեր մասին",
+    properties: "Բնակարաններ",
+    partnership: "Գործակցություն",
+    contact_us: "Կապ մեզ հետ",
+    phone: "Հեռախոս",
+
+    // properties
+    properties: "Բնակարաններ",
+    mainText: "Գլխավոր տեքստ",
+    countries: "Երկրներ",
+    newlyBuilt: "Նորակառույցներ",
+    readyHomes: "Պատրաստ բնակարաններ",
+    rentalApartments: "Վարձակալության Բնակարաններ",
+    commercial: "Կոմերցիոն",
+    housesForSale: "Վաճառքի տներ",
+    houseRentals: "Տների վարձակալություն",
+
+    // designBanner
+    designBanner: "Դիզայն Բաներ",
+    subText: "Փոքր տեքստ",
+    buttonText: "Տեքստի կոճակ",
+
+    // partner
+    partner: "Գործընկեր",
+
+    // directionContainer
+    directionContainer: "Տեղեկատվություն",
+    mainHeader: "Գլխավոր վերնագիր",
+    location: "Վայրը",
+    label: "Լեյբլ",
+    address: "Հասցե",
+    button: "Կոճակ",
+    contact: "Կապ",
+    description: "Նկարագրություն",
+    email: "Էլ․ փոստ",
+
+    // home
+    home: "Գլխավոր էջ",
+    mainBanner: "Գլխավոր Բաներ",
+    welcome: "Բարի Գալուստ",
+    smallText: "Փոքր տեքստ",
+    info1_num: "Տեղեկություն 1 - թիվ",
+    info1_text: "Տեղեկություն 1 - տեքստ",
+    info2_num: "Տեղեկություն 2 - թիվ",
+    info2_text: "Տեղեկություն 2 - տեքստ",
+    info3_num: "Տեղեկություն 3 - թիվ",
+    info3_text: "Տեղեկություն 3 - տեքստ",
+
+    calculator: "Կրեդիտ հաշվիչ",
+    input_1_name: "Մուտք 1 - անուն",
+    input_1_text: "Մուտք 1 - տեքստ",
+    input_2_name: "Մուտք 2 - անուն",
+    input_2_text: "Մուտք 2 - տեքստ",
+    input_3_name: "Մուտք 3 - անուն",
+    input_3_text: "Մուտք 3 - տեքստ",
+    table_header1: "Աղյուսակ Վերնագիր 1",
+    table_header2: "Աղյուսակ Վերնագիր 2",
+    table_header3: "Աղյուսակ Վերնագիր 3",
+    table_header4: "Աղյուսակ Վերնագիր 4",
+    moreInfo: "Ավելին",
+    loadMore: "Բեռնել Ավելին",
+
+    joinUsBanner: "Միանալ Թիմին Բաներ",
+    fullName: "Ամբողջ Անուն",
+    position: "Պաշտոն",
+
+    suggestionForm: "Առաջարկների Ֆորմա",
+    nameLabel: "Անունի Նշում",
+    phoneLabel: "Հեռախոսի Նշում",
+    budgetLabel: "Բյուջեի Նշում",
+    buyButton: "Գնել",
+    rentButton: "Վարձակալել",
+    confirmButton: "Հաստատել",
+
+    // about_us
+    about_us: "Մեր մասին",
+    header: "Վերնագիր",
+    our_services: "Մեր Ծառայությունները",
+    services: "Ծառայություններ",
+    title: "Վերնագիր",
+    description: "Նկարագրություն",
+    our_team: "Մեր Թիմը",
+
+    // partnership
+    partnership: "Գործակցություն",
+    partner_program: "Գործընկերային Ծրագիր",
+    mainTitle: "Գլխավոր Վերնագիր",
+    brandName: "Բրենդ Անուն",
+    commissionText: "Կոմիսիայի Տեքստ",
+    descriptionText: "Նկարագրության Տեքստ",
+    joinButton: "Միանալ",
+    country_banners: "Երկրների Բաներ",
+    yellowText: "Դեղին Տեքստ",
+    country1: "Երկիր 1",
+    country2: "Երկիր 2",
+    country3: "Երկիր 3",
+    country4: "Երկիր 4",
+};
+
+function translateKeyToArmenian(key: string): string | null {
+    return keyTranslations[key] || null;
+}
+
 export default function App() {
-    const [entered, setEntered] = useState(false);
+    const [entered, setEntered] = useState(true);
     const [inputPassword, setInputPassword] = useState("");
     const [jsonData, setJsonData] = useState(null);
     const [saving, setSaving] = useState(false);
@@ -137,48 +255,55 @@ function JsonEditor({ data, onChange, path }) {
         return (
             <div className="ml-4 space-y-1">
                 {data.map((item, index) => (
-                    <div key={index} className="flex gap-2 items-start">
-                        <div className="flex-1">
-                            {typeof item === "object" && item !== null ? (
-                                <JsonEditor data={item} onChange={onChange} path={[...path, index]} />
-                            ) : (
-                                <input
-                                    type="text"
-                                    value={item}
-                                    onChange={(e) => {
-                                        const arr = [...data];
-                                        arr[index] = e.target.value;
-                                        onChange(path, arr);
-                                    }}
-                                    className="border rounded p-1 w-full"
-                                />
-                            )}
+                    <>
+                        <p>#{index + 1}</p>
+                        <div key={index} style={{ backgroundColor: "#333", padding: "10px" }} className="flex gap-2 items-start rounded">
+                            <div className="flex-1">
+                                {typeof item === "object" && item !== null ? (
+                                    <JsonEditor data={item} onChange={onChange} path={[...path, index]} />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        value={item}
+                                        onChange={(e) => {
+                                            const arr = [...data];
+                                            arr[index] = e.target.value;
+                                            onChange(path, arr);
+                                        }}
+                                        className="border rounded p-1 w-full"
+                                    />
+                                )}
+                            </div>
+                            <button
+                                className="text-red-500 mt-1"
+                                onClick={() => {
+                                    const arr = data.filter((_, i) => i !== index);
+                                    onChange(path, arr);
+                                }}
+                            >
+                                ✕
+                            </button>
                         </div>
-                        <button
-                            className="text-red-500 mt-1"
-                            onClick={() => {
-                                const arr = data.filter((_, i) => i !== index);
-                                onChange(path, arr);
-                            }}
-                        >
-                            ✕
-                        </button>
-                    </div>
+                    </>
                 ))}
                 <div className="flex gap-2 mt-1">
-                    <button onClick={() => onChange(path, [...data, ""])} className="text-blue-600 text-sm">
-                        + Add item
-                    </button>
-                    <button
-                        onClick={() => {
-                            const newObject = {};
-                            Object.keys(data[0]).map((k) => (newObject[k] = ""));
-                            onChange(path, [...data, newObject]);
-                        }}
-                        className="text-green-600 text-sm"
-                    >
-                        + Add object
-                    </button>
+                    {typeof data[0] === "string" && (
+                        <button onClick={() => onChange(path, [...data, ""])} className="text-blue-600 text-sm">
+                            + Add item
+                        </button>
+                    )}
+                    {typeof data[0] !== "string" && (
+                        <button
+                            onClick={() => {
+                                const newObject = {};
+                                Object.keys(data[0]).map((k) => (newObject[k] = ""));
+                                onChange(path, [...data, newObject]);
+                            }}
+                            className="text-green-600 text-sm"
+                        >
+                            + Add object
+                        </button>
+                    )}
                 </div>
             </div>
         );
@@ -205,7 +330,7 @@ function AccordionItem({ title, children }) {
     return (
         <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
             <button className="w-full text-left px-4 py-2 font-semibold bg-gray-100 hover:bg-gray-200" onClick={() => setOpen(!open)}>
-                {title}
+                {translateKeyToArmenian(title) || title}
             </button>
             <AnimatePresence initial={false}>
                 {open && (
