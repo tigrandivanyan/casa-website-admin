@@ -13,3 +13,9 @@ services:
             IMAGE_UPLOAD_DIR: "/casa-website/public"
             PORT: "3000"
             DOCKER_DIR: "/casa-website/"
+    front:
+        build:
+            context: ./front
+        restart: always
+        ports:
+            - "6001:80"
