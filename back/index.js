@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Route 1: GET /read
-app.get("/read", (req, res) => {
+app.get("/api/read", (req, res) => {
     fs.readFile(JSON_FILE_PATH, "utf-8", (err, data) => {
         if (err) return res.status(500).json({ error: "Could not read JSON file" });
         res.json(JSON.parse(data));
@@ -39,7 +39,7 @@ app.get("/read", (req, res) => {
 });
 
 // Route 2: POST /rewrite
-app.post("/rewrite", (req, res) => {
+app.post("/api/rewrite", (req, res) => {
     const newJson = req.body;
     fs.writeFile(JSON_FILE_PATH, JSON.stringify(newJson, null, 2), "utf-8", (err) => {
         if (err) return res.status(500).json({ error: "Could not write JSON file" });
@@ -48,7 +48,7 @@ app.post("/rewrite", (req, res) => {
 });
 
 // Route 3: POST /image
-app.post("/image", upload.single("image"), (req, res) => {
+app.post("/api/image", upload.single("image"), (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No image uploaded" });
     res.json({ message: "Image uploaded successfully", filename: req.file.filename });
 });
