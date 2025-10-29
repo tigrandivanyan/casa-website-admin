@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
-
+import cors from "cors";
 dotenv.config();
 
 const app = express();
@@ -12,6 +12,7 @@ const JSON_FILE_PATH = process.env.JSON_FILE_PATH;
 const IMAGE_UPLOAD_DIR = process.env.IMAGE_UPLOAD_DIR;
 
 app.use(express.json());
+app.use(cors({ origin: "*" }));
 
 // Ensure upload directory exists
 if (!fs.existsSync(IMAGE_UPLOAD_DIR)) {
