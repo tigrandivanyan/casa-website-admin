@@ -5,7 +5,7 @@ import axios from "axios";
 const PASSWORD = "$CasaEstate3334"; // change this to your local password
 
 export default function App() {
-    const [entered, setEntered] = useState(true);
+    const [entered, setEntered] = useState(false);
     const [inputPassword, setInputPassword] = useState("");
     const [jsonData, setJsonData] = useState(null);
     const [saving, setSaving] = useState(false);
