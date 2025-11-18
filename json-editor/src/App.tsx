@@ -116,11 +116,18 @@ const keyTranslations: Record<string, string> = {
     country2: "Երկիր 2",
     country3: "Երկիր 3",
     country4: "Երկիր 4",
+    main: "Հիմնական",
+    images: "Նկարներ",
 };
 
 function translateKeyToArmenian(key: string): string | null {
     return keyTranslations[key] || null;
 }
+
+export const request = axios.create({
+    baseURL: "https://admin.casaestate.am/api",
+    // baseURL: "http://localhost:3000/api",
+});
 
 export default function App() {
     const [entered, setEntered] = useState(false);
@@ -139,7 +146,7 @@ export default function App() {
 
     useEffect(() => {
         if (entered) {
-            axios.get("https://admin.casaestate.am/api/read").then((res) => {
+            request.get("/read").then((res) => {
                 setJsonData(res.data);
             });
         }
@@ -162,7 +169,7 @@ export default function App() {
         setSaving(true);
         setSaved(false);
         try {
-            await axios.post("https://admin.casaestate.am/api/rewrite", jsonData);
+            await request.post("/rewrite", jsonData);
             setSaved(true);
         } catch (err) {
             alert("Failed to save changes");
@@ -216,7 +223,7 @@ function JsonEditor({ data, onChange, path }) {
         formData.append("name", sanitizedName);
 
         try {
-            const res = await axios.post("https://admin.casaestate.am/api/image", formData, {
+            const res = await request.post("/image", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             onChange(path, res.data.filename); // save filename in JSON
