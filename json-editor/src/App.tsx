@@ -118,6 +118,10 @@ const keyTranslations: Record<string, string> = {
     country4: "Երկիր 4",
     main: "Հիմնական",
     images: "Նկարներ",
+    buy_with_us: "Գնել մեզ հետ",
+    rent_with_us: "Վարձակալել մեզ հետ",
+    options: "Որ երկրում ինչ կա",
+    contacts: "Կոնտակտներ",
 };
 
 function translateKeyToArmenian(key: string): string | null {
@@ -257,6 +261,11 @@ function JsonEditor({ data, onChange, path }) {
         return <input type="text" value={data} onChange={(e) => onChange(path, e.target.value)} className="border rounded p-1 w-full my-1" />;
     }
 
+    // string
+    if (typeof data === "boolean") {
+        return <input type="checkbox" checked={data} onChange={(e) => onChange(path, e.target.checked)} className="border rounded p-1 w-full my-1" />;
+    }
+
     // array
     if (Array.isArray(data)) {
         return (
@@ -281,15 +290,17 @@ function JsonEditor({ data, onChange, path }) {
                                     />
                                 )}
                             </div>
-                            <button
-                                className="text-red-500 mt-1"
-                                onClick={() => {
-                                    const arr = data.filter((_, i) => i !== index);
-                                    onChange(path, arr);
-                                }}
-                            >
-                                ✕
-                            </button>
+                            {!path.includes("options") && (
+                                <button
+                                    className="text-red-500 mt-1"
+                                    onClick={() => {
+                                        const arr = data.filter((_, i) => i !== index);
+                                        onChange(path, arr);
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            )}
                         </div>
                     </>
                 ))}
@@ -299,7 +310,7 @@ function JsonEditor({ data, onChange, path }) {
                             + Add item
                         </button>
                     )}
-                    {typeof data[0] !== "string" && (
+                    {typeof data[0] !== "string" && !path.includes("options") && (
                         <button
                             onClick={() => {
                                 const newObject = {};
@@ -320,11 +331,15 @@ function JsonEditor({ data, onChange, path }) {
     if (typeof data === "object" && data !== null) {
         return (
             <div className="space-y-2">
-                {Object.entries(data).map(([key, value]) => (
-                    <AccordionItem key={key} title={key}>
-                        <JsonEditor data={value} onChange={onChange} path={[...path, key]} />
-                    </AccordionItem>
-                ))}
+                {Object.entries(data).map(([key, value]) =>
+                    value === "$$$$$$$$" ? (
+                        <h1 style={{ color: "white" }}>{key}</h1>
+                    ) : (
+                        <AccordionItem key={key} title={key}>
+                            <JsonEditor data={value} onChange={onChange} path={[...path, key]} />
+                        </AccordionItem>
+                    )
+                )}
             </div>
         );
     }
